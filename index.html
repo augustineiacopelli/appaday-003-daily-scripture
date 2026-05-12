@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>003 · Daily Scripture</title>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cinzel:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f0e0c;
+      --surface:   #1a1814;
+      --gold:      #c9a84c;
+      --gold-dim:  #8a6e2f;
+      --text:      #e8e0d0;
+      --muted:     #7a7060;
+      --border:    rgba(201, 168, 76, 0.18);
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'EB Garamond', Georgia, serif;
+      overflow: hidden;
+    }
+
+    /* Parchment texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Vignette */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.55) 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── HEADER BAR ─────────────────────────────────────── */
+    .site-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(15, 14, 12, 0.85);
+      backdrop-filter: blur(8px);
+    }
+
+    .header-num {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+    }
+
+    .header-title {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+
+    .header-home {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .header-home:hover { color: var(--gold); }
+
+    /* ── MAIN LAYOUT ────────────────────────────────────── */
+    main {
+      position: relative;
+      z-index: 1;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 24px 100px;
+    }
+
+    /* ── CARD ───────────────────────────────────────────── */
+    .card {
+      position: relative;
+      max-width: 680px;
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 52px 56px 48px;
+      text-align: center;
+    }
+
+    /* Corner ornaments */
+    .card::before, .card::after {
+      content: '';
+      position: absolute;
+      width: 20px; height: 20px;
+      border-color: var(--gold-dim);
+      border-style: solid;
+      opacity: 0.6;
+    }
+    .card::before {
+      top: 10px; left: 10px;
+      border-width: 1px 0 0 1px;
+    }
+    .card::after {
+      bottom: 10px; right: 10px;
+      border-width: 0 1px 1px 0;
+    }
+
+    /* Cross ornament */
+    .ornament {
+      display: block;
+      font-size: 18px;
+      color: var(--gold);
+      margin-bottom: 28px;
+      opacity: 0.7;
+      letter-spacing: 0.3em;
+    }
+
+    /* Verse text */
+    .verse-wrap {
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .verse-wrap.fading {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+
+    .verse-text {
+      font-size: clamp(1.25rem, 3.5vw, 1.6rem);
+      line-height: 1.75;
+      font-style: italic;
+      color: var(--text);
+      margin-bottom: 28px;
+    }
+
+    .verse-ref {
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+
+    /* Divider */
+    .divider {
+      width: 48px;
+      height: 1px;
+      background: var(--gold-dim);
+      margin: 28px auto;
+      opacity: 0.5;
+    }
+
+    /* ── BUTTON ─────────────────────────────────────────── */
+    .btn-new {
+      margin-top: 36px;
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: transparent;
+      border: 1px solid var(--gold-dim);
+      border-radius: 2px;
+      padding: 14px 36px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+    .btn-new:hover {
+      background: rgba(201, 168, 76, 0.1);
+      border-color: var(--gold);
+    }
+    .btn-new:active {
+      background: rgba(201, 168, 76, 0.18);
+    }
+
+    /* ── TESTAMENT TAG ──────────────────────────────────── */
+    .testament {
+      margin-top: 16px;
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    /* ── MOBILE ─────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .card { padding: 40px 28px 36px; }
+      .verse-text { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <span class="header-num">App 003</span>
+    <span class="header-title">Daily Scripture</span>
+    <a class="header-home" href="../index.html">← Portfolio</a>
+  </header>
+
+  <main>
+    <div class="card">
+      <span class="ornament">✦ · ✦</span>
+      <div class="verse-wrap" id="verseWrap">
+        <p class="verse-text" id="verseText"></p>
+        <div class="divider"></div>
+        <p class="verse-ref" id="verseRef"></p>
+      </div>
+    </div>
+    <button class="btn-new" id="btnNew" onclick="newVerse()">New Verse</button>
+    <p class="testament" id="testament"></p>
+  </main>
+
+  <script>
+    const verses = [
+      // Old Testament
+      { t: "Be strong and courageous. Do not be afraid or terrified because of them, for the Lord your God goes with you; he will never leave you nor forsake you.", r: "Deuteronomy 31:6", ot: true },
+      { t: "Trust in the Lord with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight.", r: "Proverbs 3:5–6", ot: true },
+      { t: "The Lord is my shepherd, I lack nothing.", r: "Psalm 23:1", ot: true },
+      { t: "He gives strength to the weary and increases the power of the weak.", r: "Isaiah 40:29", ot: true },
+      { t: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you hope and a future.", r: "Jeremiah 29:11", ot: true },
+      { t: "Even youths grow tired and weary, and young men stumble and fall; but those who hope in the Lord will renew their strength.", r: "Isaiah 40:30–31", ot: true },
+      { t: "The Lord your God is with you, the Mighty Warrior who saves. He will take great delight in you; in his love he will no longer rebuke you, but will rejoice over you with singing.", r: "Zephaniah 3:17", ot: true },
+      { t: "Delight yourself in the Lord, and he will give you the desires of your heart.", r: "Psalm 37:4", ot: true },
+      { t: "Give thanks to the Lord, for he is good; his love endures forever.", r: "Psalm 107:1", ot: true },
+      { t: "The Lord is close to the brokenhearted and saves those who are crushed in spirit.", r: "Psalm 34:18", ot: true },
+      { t: "In the beginning God created the heavens and the earth.", r: "Genesis 1:1", ot: true },
+      { t: "I lift up my eyes to the mountains — where does my help come from? My help comes from the Lord, the Maker of heaven and earth.", r: "Psalm 121:1–2", ot: true },
+      { t: "Be still, and know that I am God.", r: "Psalm 46:10", ot: true },
+      { t: "The Lord bless you and keep you; the Lord make his face shine on you and be gracious to you.", r: "Numbers 6:24–25", ot: true },
+      { t: "The heart of man plans his way, but the Lord establishes his steps.", r: "Proverbs 16:9", ot: true },
+      { t: "Create in me a pure heart, O God, and renew a steadfast spirit within me.", r: "Psalm 51:10", ot: true },
+      { t: "The Lord is my light and my salvation — whom shall I fear?", r: "Psalm 27:1", ot: true },
+      { t: "Commit your way to the Lord; trust in him and he will do this.", r: "Psalm 37:5", ot: true },
+      { t: "For the Lord is good and his love endures forever; his faithfulness continues through all generations.", r: "Psalm 100:5", ot: true },
+      { t: "Do not be anxious about anything, but seek God with prayer and petition, with thanksgiving.", r: "Philippians 4:6 (echoing Isaiah 41:10)", ot: true },
+      // New Testament
+      { t: "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.", r: "John 3:16", ot: false },
+      { t: "I can do all this through him who gives me strength.", r: "Philippians 4:13", ot: false },
+      { t: "And we know that in all things God works for the good of those who love him, who have been called according to his purpose.", r: "Romans 8:28", ot: false },
+      { t: "Do not conform to the pattern of this world, but be transformed by the renewing of your mind.", r: "Romans 12:2", ot: false },
+      { t: "Love is patient, love is kind. It does not envy, it does not boast, it is not proud.", r: "1 Corinthians 13:4", ot: false },
+      { t: "For it is by grace you have been saved, through faith — and this is not from yourselves, it is the gift of God.", r: "Ephesians 2:8", ot: false },
+      { t: "The thief comes only to steal and kill and destroy; I have come that they may have life, and have it to the full.", r: "John 10:10", ot: false },
+      { t: "Come to me, all you who are weary and burdened, and I will give you rest.", r: "Matthew 11:28", ot: false },
+      { t: "But seek first his kingdom and his righteousness, and all these things will be given to you as well.", r: "Matthew 6:33", ot: false },
+      { t: "Now faith is confidence in what we hope for and assurance about what we do not see.", r: "Hebrews 11:1", ot: false },
+      { t: "Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God.", r: "Philippians 4:6", ot: false },
+      { t: "Therefore, if anyone is in Christ, the new creation has come: the old has gone, the new is here!", r: "2 Corinthians 5:17", ot: false },
+      { t: "Jesus wept.", r: "John 11:35", ot: false },
+      { t: "I am the way and the truth and the life. No one comes to the Father except through me.", r: "John 14:6", ot: false },
+      { t: "For I am convinced that neither death nor life, neither angels nor demons, neither the present nor the future, nor any powers, can separate us from the love of God.", r: "Romans 8:38–39", ot: false },
+      { t: "Your word is a lamp for my feet, a light on my path.", r: "Psalm 119:105", ot: false },
+      { t: "Be on your guard; stand firm in the faith; be courageous; be strong. Do everything in love.", r: "1 Corinthians 16:13–14", ot: false },
+      { t: "Cast all your anxiety on him because he cares for you.", r: "1 Peter 5:7", ot: false },
+      { t: "Ask and it will be given to you; seek and you will find; knock and the door will be opened to you.", r: "Matthew 7:7", ot: false },
+      { t: "The Lord is not slow in keeping his promise, as some understand slowness. Instead he is patient with you, not wanting anyone to perish.", r: "2 Peter 3:9", ot: false },
+      { t: "For the wages of sin is death, but the gift of God is eternal life in Christ Jesus our Lord.", r: "Romans 6:23", ot: false },
+      { t: "Let your light shine before others, that they may see your good deeds and glorify your Father in heaven.", r: "Matthew 5:16", ot: false },
+      { t: "But the fruit of the Spirit is love, joy, peace, forbearance, kindness, goodness, faithfulness, gentleness and self-control.", r: "Galatians 5:22–23", ot: false },
+      { t: "For where two or three gather in my name, there am I with them.", r: "Matthew 18:20", ot: false },
+      { t: "And now these three remain: faith, hope and love. But the greatest of these is love.", r: "1 Corinthians 13:13", ot: false },
+      { t: "Let the peace of Christ rule in your hearts, since as members of one body you were called to peace. And be thankful.", r: "Colossians 3:15", ot: false },
+      { t: "If we confess our sins, he is faithful and just and will forgive us our sins and purify us from all unrighteousness.", r: "1 John 1:9", ot: false },
+      { t: "Greater love has no one than this: to lay down one's life for one's friends.", r: "John 15:13", ot: false },
+      { t: "Rejoice in the Lord always. I will say it again: Rejoice!", r: "Philippians 4:4", ot: false },
+      { t: "In him we have redemption through his blood, the forgiveness of sins, in accordance with the riches of God's grace.", r: "Ephesians 1:7", ot: false },
+    ];
+
+    let lastIndex = -1;
+
+    function pick() {
+      let idx;
+      do { idx = Math.floor(Math.random() * verses.length); } while (idx === lastIndex);
+      lastIndex = idx;
+      return verses[idx];
+    }
+
+    function newVerse() {
+      const wrap = document.getElementById('verseWrap');
+      const btn  = document.getElementById('btnNew');
+      btn.disabled = true;
+      wrap.classList.add('fading');
+
+      setTimeout(() => {
+        const v = pick();
+        document.getElementById('verseText').textContent = '\u201C' + v.t + '\u201D';
+        document.getElementById('verseRef').textContent  = v.r;
+        document.getElementById('testament').textContent = v.ot ? 'Old Testament' : 'New Testament';
+        wrap.classList.remove('fading');
+        btn.disabled = false;
+      }, 400);
+    }
+
+    // Load on first render
+    newVerse();
+  </script>
+</body>
+</html>
